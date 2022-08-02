@@ -1,0 +1,127 @@
+//-------------------------------------------------------
+//Color Palette
+//-------------------------------------------------------
+$white: #fff;
+$gray-100: #f8f9fa;
+$gray-200: #e9ecef;
+$gray-300: #dee2e6;
+$gray-400: #ced4da;
+$gray-500: #adb5bd;
+$gray-600: #6c757d;
+$gray-700: #495057;
+$gray-800: #343a40;
+$gray-900: #212529;
+$black: #000;
+
+$teal: #20c997;
+$cyan: #11aac8;
+$darkpink: #de5c9d;
+$violet: blueviolet;
+$indigo: #6610f2;
+$dark: #282828;
+$light: #d6d6d6;
+$black: #000000;
+
+//-------------------------------------------------------
+//Background
+//-------------------------------------------------------
+
+$background-color: #1e1d1d;
+
+//-------------------------------------------------------
+// Border Color
+//-------------------------------------------------------
+
+$border-color: #222222;
+
+//-------------------------------------------------------
+//List
+//-------------------------------------------------------
+
+$list-background-color: #262626;
+
+//-------------------------------------------------------
+// Inputs
+//-------------------------------------------------------
+
+$input-bg: lighten($background-color, 20%);
+$input-disabled-bg: lighten($input-bg, 20%);
+$input-color: $light;
+$input-placeholder-color: $light;
+$input-border-color: lighten($border-color, 20%);
+
+//-------------------------------------------------------
+// Card
+//-------------------------------------------------------
+
+$card-border-color: $dark;
+
+//-------------------------------------------------------
+// Table
+//-------------------------------------------------------
+
+$table-color: $light;
+$table-bg: $dark;
+
+$table-striped-color: $table-color;
+$table-striped-bg-factor: 0.3;
+$table-striped-bg: rgba($black, $table-striped-bg-factor);
+
+$table-hover-color: $table-color;
+$table-hover-bg-factor: 0.5;
+$table-hover-bg: rgba($indigo, $table-hover-bg-factor);
+
+//-------------------------------------------------------
+// Pagination
+//-------------------------------------------------------
+
+$pagination-color: $light;
+$pagination-bg: $dark;
+$pagination-border-color: $border-color;
+
+$pagination-hover-color: lighten($pagination-color, 10%);
+$pagination-hover-bg: lighten($pagination-bg, 10%);
+$pagination-hover-border-color: lighten($pagination-border-color, 10%);
+
+$pagination-active-color: $light;
+$pagination-active-bg: $indigo;
+$pagination-active-border-color: $pagination-active-bg;
+
+$pagination-focus-color: $light;
+$pagination-focus-bg: $indigo;
+
+$pagination-disabled-color: darken($light, 20%);
+$pagination-disabled-bg: lighten($dark, 20%);
+$pagination-disabled-border-color: $pagination-disabled-bg;
+
+//-------------------------------------------------------
+// Modals
+//-------------------------------------------------------
+
+$modal-content-color: $light;
+$modal-content-bg: $dark;
+$modal-content-border-color: $dark;
+
+$modal-header-border-color: lighten($dark, 10%);
+
+$modal-footer-border-color: lighten($dark, 10%);
+
+$modal-backdrop-bg: $black;
+$modal-backdrop-opacity: 0.5;
+
+//-------------------------------------------------------
+// Alerts
+//-------------------------------------------------------
+
+$alert-bg-scale: -20%;
+$alert-border-scale: -10%;
+$alert-color-scale: 20%;
+
+//-------------------------------------------------------
+// Override default Bootstrap theme variables for custom themes
+//-------------------------------------------------------
+
+$primary: $indigo;
+$success: $teal;
+$danger: $darkpink;
+$body-bg: $background-color;

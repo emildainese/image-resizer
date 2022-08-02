@@ -1,0 +1,7 @@
+.table-hover tbody tr:hover td,
+.table-hover tbody tr:hover th {
+  transition: all 0.3s !important;
+  &:hover {
+    transition: all 0.3s !important;
+  }
+}

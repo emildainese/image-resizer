@@ -1,81 +1,120 @@
-import {
-  RESIZER_RESET_STATE,
-  RESIZER_CLEAR_STATE,
-  IMG_UPLOAD_REQUEST,
-  IMG_UPLOAD_SUCCESS,
-  IMG_UPLOAD_FAIL,
-  SET_LARGE_WIDTH,
-  SET_LARGE_HEIGHT,
-  SET_MEDIUM_HEIGHT,
-  SET_MEDIUM_WIDTH,
-  SET_THUMBNAIL_WIDTH,
-  SET_THUMBNAIL_HEIGHT,
-  SET_IMAGE_SIZE,
-  CLEAR_ERROR,
-  SET_IMAGE_QUALITY,
-  SET_IMG_FILE,
-  CLEAR_NOTIFICATION,
-} from '../constants/resizerConstants';
-
-import { DEFAULT_IMG_QUALITY } from '../../constants/home';
-
-const SCALE_WIDTH_FACTOR = 0.25;
-const LARGE_IMG_WIDTH = 800;
-const MEDIUM_IMG_WIDTH = 400;
-const THUMBNAIL_IMG_WIDTH = 400;
+import * as type from "../constants/resizerConstants";
+import * as constant from "../../constants/home";
 
 const initialResizerState = {
   loading: false,
   success: false,
   error: null,
   file: null,
-  fileName: '',
-  quality: DEFAULT_IMG_QUALITY,
+  fileName: "",
+  fileType: "",
+  imageWidth: "",
+  imageHeight: "",
+  originalImageSize: 0,
+  quality: constant.DEFAULT_IMG_QUALITY,
+  projectId: null,
   imgData: null,
-  imageWidth: '',
-  imageHeight: '',
+  uploading: false,
+  uploaded: false,
   large: {
-    width: LARGE_IMG_WIDTH,
-    height: LARGE_IMG_WIDTH * (1 - SCALE_WIDTH_FACTOR),
+    width: constant.LARGE_IMG_WIDTH,
+    height: constant.LARGE_IMG_WIDTH * (1 - constant.SCALE_WIDTH_FACTOR),
   },
   medium: {
-    width: MEDIUM_IMG_WIDTH,
-    height: MEDIUM_IMG_WIDTH * (1 - SCALE_WIDTH_FACTOR),
+    width: constant.MEDIUM_IMG_WIDTH,
+    height: constant.MEDIUM_IMG_WIDTH * (1 - constant.SCALE_WIDTH_FACTOR),
   },
   thumbnail: {
-    width: THUMBNAIL_IMG_WIDTH,
-    height: THUMBNAIL_IMG_WIDTH * (1 - SCALE_WIDTH_FACTOR),
+    width: constant.THUMBNAIL_IMG_WIDTH,
+    height: constant.THUMBNAIL_IMG_WIDTH * (1 - constant.SCALE_WIDTH_FACTOR),
   },
+  //Create another slice
+  customFormatError: null,
+  customFormatLabel: "",
+  customFormatWidth: "",
+  customFormatHeight: "",
+  customFormats: [],
 };
 
 export const resizerReducer = (state = initialResizerState, action) => {
   switch (action.type) {
-    case IMG_UPLOAD_REQUEST:
+    case type.IMG_UPLOAD_REQUEST:
       return {
         ...state,
         loading: true,
+        uploading: true,
       };
-    case IMG_UPLOAD_SUCCESS:
+    case type.IMG_UPLOAD_SUCCESS:
       return {
         ...state,
         loading: false,
         success: true,
         imgData: action.payload,
+        projectId: action.payload.projectId,
+        uploaded: true,
       };
-    case IMG_UPLOAD_FAIL:
+    case type.IMG_UPLOAD_FAIL:
       return {
         ...state,
         loading: false,
         success: false,
         error: action.payload,
+        uploading: false,
+        uploaded: false,
       };
-    case SET_IMG_FILE:
+    case type.SET_IMG_FILE:
+      const file = action.payload;
       return {
         ...state,
-        file: action.payload.file,
-        fileName: action.payload.fileName,
+        file: file,
+        fileName: file.name,
+        fileType: file.type,
+        originalImageSize: file.size / 1000,
       };
-    case SET_LARGE_WIDTH:
+    case type.CUSTOM_FORMAT_ERROR:
+      return {
+        ...state,
+        customFormatError: action.payload,
+      };
+    case type.CLEAR_CUSTOM_FORMAT_ERROR:
+      return {
+        ...state,
+        customFormatError: null,
+      };
+    case type.SET_CUSTOM_FORMAT_WIDTH:
+      return {
+        ...state,
+        customFormatWidth: action.payload,
+      };
+    case type.SET_CUSTOM_FORMAT_HEIGHT:
+      return {
+        ...state,
+        customFormatHeight: action.payload,
+      };
+    case type.SET_CUSTOM_FORMAT_LABEL:
+      return {
+        ...state,
+        customFormatLabel: action.payload,
+      };
+    case type.ADD_CUSTOM_FORMAT:
+      return {
+        ...state,
+        customFormatWidth: "",
+        customFormatHeight: "",
+        customFormatLabel: "",
+        customFormats: [...state.customFormats, action.payload],
+      };
+    case type.REMOVE_CUSTOM_FORMAT:
+      return {
+        ...state,
+        customFormatWidth: "",
+        customFormatHeight: "",
+        customFormatLabel: "",
+        customFormats: state.customFormats.filter(
+          (customFormat) => customFormat.label !== action.payload
+        ),
+      };
+    case type.SET_LARGE_WIDTH:
       return {
         ...state,
         large: {
@@ -83,7 +122,7 @@ export const resizerReducer = (state = initialResizerState, action) => {
           width: action.payload,
         },
       };
-    case SET_MEDIUM_WIDTH:
+    case type.SET_MEDIUM_WIDTH:
       return {
         ...state,
         medium: {
@@ -91,7 +130,7 @@ export const resizerReducer = (state = initialResizerState, action) => {
           width: action.payload,
         },
       };
-    case SET_THUMBNAIL_WIDTH:
+    case type.SET_THUMBNAIL_WIDTH:
       return {
         ...state,
         thumbnail: {
@@ -99,8 +138,7 @@ export const resizerReducer = (state = initialResizerState, action) => {
           width: action.payload,
         },
       };
-
-    case SET_LARGE_HEIGHT:
+    case type.SET_LARGE_HEIGHT:
       return {
         ...state,
         large: {
@@ -108,7 +146,7 @@ export const resizerReducer = (state = initialResizerState, action) => {
           height: action.payload,
         },
       };
-    case SET_MEDIUM_HEIGHT:
+    case type.SET_MEDIUM_HEIGHT:
       return {
         ...state,
         medium: {
@@ -116,7 +154,7 @@ export const resizerReducer = (state = initialResizerState, action) => {
           height: action.payload,
         },
       };
-    case SET_THUMBNAIL_HEIGHT:
+    case type.SET_THUMBNAIL_HEIGHT:
       return {
         ...state,
         thumbnail: {
@@ -124,35 +162,37 @@ export const resizerReducer = (state = initialResizerState, action) => {
           height: action.payload,
         },
       };
-    case SET_IMAGE_SIZE:
+    case type.SET_IMAGE_SIZE:
       return {
         ...state,
         imageHeight: action.payload.height,
         imageWidth: action.payload.width,
       };
-    case SET_IMAGE_QUALITY:
+    case type.SET_IMAGE_QUALITY:
       return {
         ...state,
         quality: action.payload,
       };
-    case RESIZER_CLEAR_STATE:
+    case type.RESIZER_CLEAR_STATE:
       return {
         ...state,
         file: null,
-        quality: DEFAULT_IMG_QUALITY,
-        fileName: '',
+        quality: constant.DEFAULT_IMG_QUALITY,
+        fileName: "",
+        fileType: "",
+        originalImageSize: 0,
       };
-    case CLEAR_ERROR:
+    case type.CLEAR_ERROR:
       return {
         ...state,
         error: null,
       };
-    case CLEAR_NOTIFICATION:
+    case type.CLEAR_NOTIFICATION:
       return {
         ...state,
         success: false,
       };
-    case RESIZER_RESET_STATE:
+    case type.RESIZER_RESET_STATE:
       return initialResizerState;
     default:
       return state;

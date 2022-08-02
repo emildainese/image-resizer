@@ -1,15 +1,29 @@
-import * as type from '../constants/explorerConstants';
+import * as type from "../constants/explorerConstants";
+import { setHeaders } from "../../util/headers";
 
-//------------------------------------------------------------
-export const fetchProjects = (target) => async (dispatch) => {
-  dispatch({ type: type.PROJECTS_RESET });
-  const targetDir = new URLSearchParams();
-  targetDir.set('directory', target);
+//----------------------------------------------------------------------------
+//
+//----------------------------------------------------------------------------
+export const fetchProjects = (target, force) => async (dispatch) => {
+  const query = new URLSearchParams();
+  query.set("dir", target);
+
+  let headers = null;
+  if (Boolean(force)) {
+    query.set("force", force);
+    headers = setHeaders();
+    dispatch({ type: type.PROJECTS_RESET });
+  }
+
   dispatch({ type: type.PROJECTS_FETCH_REQUEST });
-  const res = await fetch(`/api/dirtree?${targetDir}`);
+  const res = await fetch(`/api/dirtree?${query}`, {
+    method: "GET",
+    ...(force && { headers }),
+  });
+
   const data = await res.json();
 
-  if (data.error || !res.ok) {
+  if (!res.ok || data.error) {
     return dispatch({
       type: type.PROJECTS_FETCH_FAIL,
       payload: data.error || `${res.status} - ${res.statusText}`,
@@ -19,11 +33,20 @@ export const fetchProjects = (target) => async (dispatch) => {
   dispatch({ type: type.PROJECTS_FETCH_SUCCESS, payload: data });
 };
 
-//------------------------------------------------------------
-export const deleteImage = () => (dispatch) => {};
+//----------------------------------------------------------------------------
+//
+//----------------------------------------------------------------------------
 
-//------------------------------------------------------------
-export const editImage = () => (dispatch) => {};
+export const deleteProject = () => async (dispatch) => {};
 
-//------------------------------------------------------------
-export const downloadImage = () => (dispatch) => {};
+//----------------------------------------------------------------------------
+//
+//----------------------------------------------------------------------------
+
+export const editProject = () => async (dispatch) => {};
+
+//----------------------------------------------------------------------------
+//
+//----------------------------------------------------------------------------
+
+export const downloadImage = () => async (dispatch) => {};

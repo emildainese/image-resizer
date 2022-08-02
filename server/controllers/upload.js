@@ -1,5 +1,5 @@
-import path from 'path';
-import fs from 'fs';
+import { transformData } from "../util/transform.js";
+import { Image, Project } from "../models/index.js";
 
 //-----------------------------------------------------------
 
@@ -7,41 +7,21 @@ export const postImage = async (req, res, next) => {
   const { file } = req;
   const { imagesData } = req.body;
 
-  if (!file) {
-    return next(new Error('Please provide a file'));
+  if (!file || !imagesData) {
+    return next(new Error("Please provide a valid image file."));
   }
 
-  res.status(200).json({
-    message: `Image ${file.originalname} succesfully uploaded and optimized`,
-    images: imagesData,
-  });
-};
+  try {
+    const { id } = await Project.create({ raw: true });
+    const projectData = transformData(imagesData, id);
+    await Image.bulkCreate(projectData);
 
-//-----------------------------------------------------------
-
-export const getImages = async (req, res, next) => {
-  const { date } = req.params;
-
-  if (!date) {
-    return next(new Error('You must provide a valid date'));
+    res.status(200).json({
+      message: `Image ${file.originalname} succesfully uploaded and optimized.`,
+      images: imagesData,
+      projectId: id,
+    });
+  } catch (error) {
+    return next(new Error(error.message || `Could not upload images.`));
   }
-
-  const month = null;
-  const year = null;
-
-  const filepath = path.join(
-    path.resolve(),
-    '..',
-    'upload',
-    'img',
-    year,
-    month
-  );
-
-  const imageType = null;
-
-  res.setHeader('Content-Type', `image/${imageType}`);
-
-  const stream = fs.createReadStream(filepath);
-  stream.pipe(res);
 };

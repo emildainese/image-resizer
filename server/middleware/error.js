@@ -1,28 +1,26 @@
-const errorHandler = (err, req, res, next) => {
-  // Mongoose Bad ObjectId
-  if (err.name === 'CastError') {
-    const message = `Resource not found`;
-    err = new Error(message);
-  }
+import { log } from "../util/log.js";
 
-  // Mongoose duplicate key
-  if (err.code === 11000) {
-    const message = 'Duplicate field value entered';
-    err = new Error(message);
-  }
+const debug = true;
 
-  // Mongoose validation error
-  if (err.name === 'ValidationError') {
-    const message = Object.values(err).map((val) => val.message);
-    err = new Error(message);
-  }
-
-  console.log('Error middleware ', err);
-
-  res.status(err.statusCode || 500).json({
+export const notFound = (req, res, next) => {
+  res.status(404).json({
     success: false,
-    error: err.message ? err.message : err ? err : 'Server Error',
+    error: `Route ${req.originalUrl} not found`,
   });
 };
 
-export default errorHandler;
+export const databaseError = (req, res, next) => {};
+
+export const connectionError = (req, res, next) => {};
+
+export const errorHandler = (err, req, res, next) => {
+  debug && log("[Error Middleware] ", err);
+  res.status(req.statusCode || 500).json({
+    success: false,
+    error: err.message
+      ? err.message
+      : err
+      ? JSON.stringify(err)
+      : "Internal Server Error",
+  });
+};

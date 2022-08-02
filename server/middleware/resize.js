@@ -1,34 +1,34 @@
-import path from 'path';
-import SharpResizer from 'multer-sharp-resizer';
-// import sharp from 'sharp';
-import { v4 } from 'uuid';
+import path from "path";
+import SharpResizer from "multer-sharp-resizer";
+import { v4 } from "uuid";
 
 const resizeImage = async (req, res, next) => {
   const today = new Date();
   const year = today.getFullYear();
-  const month = `${today.getMonth() + 1}`.padStart(2, '0');
+  const month = `${today.getMonth() + 1}`.padStart(2, "0");
   const { file } = req;
   const sizes = JSON.parse(req.body.sizes);
+  const originalImageSize = +req.body.originalImageSize;
 
-  const filename = `${file.originalname.split('.')[0]}-${v4()}${path.extname(
-    file.originalname
-  )}`;
+  const filename = `${year}-${month}-${
+    file.originalname.split(".")[0]
+  }-${v4()}${path.extname(file.originalname)}`;
 
   const uploadPath = path.join(
     path.resolve(),
-    'upload',
-    'img',
+    "upload",
+    "img",
     `${year}`,
     `${month}`
   );
 
   const fileUrl = `${req.protocol}://${req.get(
-    'host'
+    "host"
   )}/upload/img/${year}/${month}`;
 
   // sharp options
   const sharpOptions = {
-    fit: 'cover',
+    fit: "cover",
     background: { r: 255, g: 255, b: 255 },
   };
 
@@ -44,17 +44,21 @@ const resizeImage = async (req, res, next) => {
 
   // call resize method for resizing files
   await resizeObj.resize();
-  const getDataUploaded = resizeObj.getData();
 
   // Get details of uploaded files: Used by multer .array() or .single()
-  req.body.imagesData = getDataUploaded;
+  const imagesData = {
+    ...resizeObj.getData(),
+    sizes,
+    originalImageSize,
+  };
+
+  req.body.imagesData = imagesData;
 
   next();
 };
 
 export default resizeImage;
 
-// console.log(file.buffer.byteLength);
 // let buffer = null;
 // if (file.mimetype === 'image/jpeg') {
 //   buffer = await sharp(file.buffer)
